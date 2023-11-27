@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Nome do arquivo resultados
+result_file="resultados.txt"
+
 # Repetição do teste 5 vezes
 for i in {1..5}; do
 
@@ -18,6 +21,10 @@ for i in {1..5}; do
     # Conteúdo para o arquivo de teste
     echo "Este é um arquivo de teste para compactação usando gzip e tar." > "$original_file"
 
+    # Teste com gzip
+    echo "Teste $i - Verificação com gzip -t:" >> "$result_file"
+    gzip -t "$gzip_file" >> "$result_file"
+
     echo "Compactando usando gzip..."
     gzip "$original_file"
 
@@ -34,8 +41,16 @@ for i in {1..5}; do
     # Cria um arquivo para testar a compactação com tar
     echo "Este é um segundo arquivo de teste." > "segundo_arquivo.txt"
 
+    # Teste com tar
+    echo "Teste $i - Verificação com tar -tzvf:" >> "$result_file"
+    tar -tzvf "$tar_file" >> "$result_file"
+
     echo "Compactando usando tar..."
     tar -cvf "$tar_file" "$original_file" "segundo_arquivo.txt"
+
+    # Teste com tar
+    echo "Teste $i - Verificação com tar -ztvf:" >> "$result_file"
+    tar -ztvf "$tar_file" >> "$result_file"
 
     # Verifica se o arquivo compactado com tar existe
     if [ -e "$tar_file" ]; then
@@ -53,3 +68,9 @@ for i in {1..5}; do
     echo "Teste $i concluído."
 
 done
+
+# Executa o comando top e redireciona a saída para o arquivo resultados
+top -b -n 1 >> "$result_file"
+
+# Exibe o arquivo de resultados
+cat "$result_file"
