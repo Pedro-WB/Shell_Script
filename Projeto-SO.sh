@@ -43,14 +43,11 @@ for i in {1..5}; do
 
     # Teste com tar
     echo "Teste $i - Verificação com tar -tzvf:" >> "$result_file"
-    tar -tzvf "$tar_file" >> "$result_file"
-
-    echo "Compactando usando tar..."
-    tar -cvf "$tar_file" "$original_file" "segundo_arquivo.txt"
+    tar -czvf "$tar_file" "$original_file" "segundo_arquivo.txt" >> "$result_file"
 
     # Teste com tar
     echo "Teste $i - Verificação com tar -ztvf:" >> "$result_file"
-    tar -ztvf "$tar_file" >> "$result_file"
+    tar -xzvf "$tar_file" >> "$result_file"
 
     # Verifica se o arquivo compactado com tar existe
     if [ -e "$tar_file" ]; then
