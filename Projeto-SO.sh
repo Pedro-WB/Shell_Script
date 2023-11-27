@@ -23,16 +23,16 @@ for i in {1..5}; do
 
     # Teste com gzip
     echo "Compactando usando gzip..."
-    gzip "$original_file"
+    time gzip "$original_file" >> "$result_file"
     
     echo "Teste $i - Verificação com gzip -t:" >> "$result_file"
-    gzip -t "$gzip_file" >> "$result_file"
+    gzip -l "$gzip_file" >> "$result_file"
 
     # Verifica se o arquivo compactado com gzip existe
     if [ -e "$gzip_file" ]; then
         echo "gzip: Compactação bem-sucedida."
         echo "Descompactando usando gzip..."
-        gzip -d "$gzip_file"
+        time gzip -d "$gzip_file" >> "$result_file"
         echo "gzip: Descompactação bem-sucedida."
     else
         echo "gzip: Falha na compactação."
@@ -43,17 +43,17 @@ for i in {1..5}; do
 
     # Teste com tar
     echo "Teste $i - Verificação com tar -tzvf:" >> "$result_file"
-    tar -czvf "$tar_file" "$original_file" "segundo_arquivo.txt" >> "$result_file"
+    time tar -czvf "$tar_file" "$original_file" "segundo_arquivo.txt" >> "$result_file"
 
     # Teste com tar
     echo "Teste $i - Verificação com tar -ztvf:" >> "$result_file"
-    tar -xzvf "$tar_file" >> "$result_file"
+    time tar -xzvf "$tar_file" >> "$result_file"
 
     # Verifica se o arquivo compactado com tar existe
     if [ -e "$tar_file" ]; then
         echo "tar: Compactação bem-sucedida."
         echo "Descompactando usando tar..."
-        tar -xvf "$tar_file"
+        time tar -xvvf "$tar_file" >> "$result_file"
         echo "tar: Descompactação bem-sucedida."
     else
         echo "tar: Falha na compactação."
@@ -66,11 +66,5 @@ for i in {1..5}; do
 
 done
 
-# Executa o comando top e redireciona a saída para o arquivo resultados
-top -b -n 1 >> "$result_file"
-
 # Exibe o arquivo de resultados
 cat "$result_file"
-
-# Limpa o arquivo de resultados ao final (opcional)
-# rm "$result_file"
