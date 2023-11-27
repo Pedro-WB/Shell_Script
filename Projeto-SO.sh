@@ -8,7 +8,10 @@ for i in {1..5}; do
 
     # Solicita ao usuário o nome do arquivo de teste
     read -p "Digite o nome do arquivo de teste (sem extensão): " user_input
-
+    
+    # Conteúdo para o arquivo de teste
+    echo "Este é um arquivo de teste para compactação usando gzip e tar." > "${user_input}.txt"
+    
     # Nome do arquivo a ser compactado
     original_file="${user_input}.txt"
 
@@ -18,15 +21,12 @@ for i in {1..5}; do
     # Nome do arquivo compactado com tar
     tar_file="${original_file}.tar"
 
-    # Conteúdo para o arquivo de teste
-    echo "Este é um arquivo de teste para compactação usando gzip e tar." > "$original_file"
-
     # Teste com gzip
-    echo "Teste $i - Verificação com gzip -t:" >> "$result_file"
-    gzip -t "$gzip_file" >> "$result_file"
-
     echo "Compactando usando gzip..."
     gzip "$original_file"
+    
+    echo "Teste $i - Verificação com gzip -t:" >> "$result_file"
+    gzip -t "$gzip_file" >> "$result_file"
 
     # Verifica se o arquivo compactado com gzip existe
     if [ -e "$gzip_file" ]; then
