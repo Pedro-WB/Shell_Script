@@ -15,9 +15,11 @@ for i in {1..5}; do
     # Nome do arquivo a ser compactado
     original_file="${user_input}.txt"
 
-    # Nome do arquivo compactado com gzip
+    # Nome do arquivo compactado com gzip e com tar
     gzip_file="${original_file}.gz"
 
+    tar_file="${original_file}.tar"
+    
     # Teste com gzip
     echo "Compactando usando gzip..."
     time gzip "$original_file" >> "$result_file"
@@ -40,14 +42,14 @@ for i in {1..5}; do
 
     # Teste com tar
     echo "Teste $i - Verificação com tar -tzvf:" >> "$result_file"
-    time tar -czvf "$gzip_file" "$original_file" "segundo_arquivo.txt" >> "$result_file"
+    time tar -czvf "$tar_file" "$original_file" "segundo_arquivo.txt" >> "$result_file"
 
     # Teste com tar
     echo "Teste $i - Verificação com tar -ztvf:" >> "$result_file"
-    time tar -xzvf "$gzip_file" >> "$result_file"
+    time tar -xzvf "$tar_file" >> "$result_file"
 
     # Verifica se o arquivo compactado com tar existe
-    if [ -e "$gzip_file" ]; then
+    if [ -e "$tar_file" ]; then
         echo "tar: Compactação bem-sucedida."
         echo "Descompactando usando tar..."
         time tar -xvvf "$tar_file" >> "$result_file"
@@ -57,7 +59,7 @@ for i in {1..5}; do
     fi
 
     # Limpa os arquivos temporários criados
-    rm "$original_file" "$gzip_file" "segundo_arquivo.txt"
+    rm "$original_file" "$gzip_file" "$tar_file" "segundo_arquivo.txt"
 
     echo "Teste $i concluído."
 
