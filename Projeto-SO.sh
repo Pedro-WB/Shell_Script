@@ -3,8 +3,8 @@
 # Nome do arquivo resultados
 result_file="resultados.txt"
 
-# Repetição do teste 5 vezes
-for i in {1..5}; do
+# Repetição do teste 9 vezes
+for i in {1..9}; do
 
     # Solicita ao usuário o nome do arquivo de teste
     read -p "Digite o nome do arquivo de teste (sem extensão): " user_input
