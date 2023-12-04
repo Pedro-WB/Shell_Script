@@ -4,13 +4,23 @@
 result_file="resultados.txt"
 
 # Repetição do teste 9 vezes
-for i in {1..9}; do
+for i in {1..10}; do
 
     # Solicita ao usuário o nome do arquivo de teste
     read -p "Digite o nome do arquivo de teste (sem extensão): " user_input
     
     # Conteúdo para o arquivo de teste
-    echo "Este é um arquivo de teste para compactação usando gzip e tar." > "${user_input}.txt"
+    echo "Este é um arquivo de teste para compactação usando gzip e tar. 
+    Acredite, pense e faça,
+    use sua intuição,
+    transforme sonho em suor,
+    pensamento em ação.
+    Enfrente cada batalha
+    sabendo que a gente falha
+    e que isso é natural,
+    cair pra se levantar,
+    aprender para ensinar
+    que o bem é maior que o mal. -- Bráulio Bessa --" > "${user_input}.txt"
     
     # Nome do arquivo a ser compactado
     original_file="${user_input}.txt"
