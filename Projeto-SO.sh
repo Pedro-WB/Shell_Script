@@ -69,7 +69,7 @@ for i in {1..10}; do
     fi
 
     # Limpa os arquivos temporários criados
-    rm "$original_file" "$gzip_file" "$tar_file" "segundo_arquivo.txt"
+    rm "$original_file" "$tar_file" "segundo_arquivo.txt"
 
     echo "Teste $i concluído."
 
