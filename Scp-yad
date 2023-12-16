@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Função para exibir a interface gráfica
+show_dialog() {
+    yad --form \
+        --title "SCP Transferência de Arquivos" \
+        --text "Digite as informações de transferência" \
+        --field="Arquivo Local" ""\
+        --field="Usuário Remoto" ""\
+        --field="Host Remoto" ""\
+        --field="Caminho Remoto" ""\
+        --button="Cancelar:1" \
+        --button="Transferir:0"
+}
+
+# Função para realizar a transferência de arquivo usando scp
+perform_transfer() {
+    local_file="$1"
+    remote_user="$2"
+    remote_host="$3"
+    remote_path="$4"
+
+    scp "$local_file" "$remote_user@$remote_host:$remote_path"
+}
+
+# Função principal
+main() {
+    # Exibir a interface gráfica
+    result=$(show_dialog)
+
+    # Verificar se o usuário pressionou "Transferir"
+    if [ $? -eq 0 ]; then
+        # Obter valores dos campos
+        local_file=$(echo $result | cut -d'|' -f1)
+        remote_user=$(echo $result | cut -d'|' -f2)
+        remote_host=$(echo $result | cut -d'|' -f3)
+        remote_path=$(echo $result | cut -d'|' -f4)
+
+        # Realizar a transferência
+        perform_transfer "$local_file" "$remote_user" "$remote_host" "$remote_path"
+
+        yad --title "Concluído" --text "Transferência concluída!"
+    else
+        yad --title "Cancelado" --text "Transferência cancelada."
+    fi
+}
+
+# Chamar a função principal
+main
