@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 # Função para exibir a interface gráfica
 show_dialog() {
