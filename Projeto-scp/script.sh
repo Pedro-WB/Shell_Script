@@ -15,42 +15,44 @@ if ! check_command "yad"; then
     exit 1
 fi
 
-# Pedir informações de conexão SSH antes de exibir a interface gráfica
-read -p "Usuário Remoto: " remote_user
-read -p "Host Remoto: " remote_host
-read -p "Porta SSH (press Enter para padrão 22): " ssh_port
+# Função para mostrar o diálogo de seleção de arquivo
+select_file_dialog() {
+    yad --file \
+        --width=600 \
+        --height=400 \
+        --file-filter="Todos os Arquivos | *.*" \
+        --file-filter="Arquivos de Texto | *.txt" \
+        --file-filter="Documentos | *.doc;*.docx;*.odt" \
+        --file-filter="Imagens | *.png;*.jpg;*.jpeg;*.gif" \
+        --file-filter="Todos os Arquivos | *.*" \
+        --title="Selecionar Arquivo"
+}
 
-# Validar conexão SSH antes de exibir a interface gráfica
-if ! validate_ssh_connection "$remote_user" "$remote_host" "$ssh_port"; then
-    print_error "Erro ao conectar-se ao host remoto. Verifique as credenciais SSH e a porta especificada."
-    exit 1
-fi
-
-# Interface gráfica
+# Interface gráfica para obter informações de conexão SSH
 FORM=$(yad --form \
     --title "SCP Transferência de Arquivos" \
-    --text-align="center" \
     --width=400 \
-    --height=200 \
-    --field="Arquivo Local:FL" "" \
-    --field="Caminho Remoto:FL" "" \
-    --field="Progresso:PM" "" \
+    --height=600 \
+    --text-align="center" \
+    --field="Arquivo Local:FBTN" "yad --file --width=600 --height=400" \
+    --field="Caminho Remoto:TXT" "" \
+    --field="Usuário Remoto:TXT" "" \
+    --field="Host Remoto:TXT" "" \
+    --field="Porta SSH:NUM" "22" \
+    --field="Progresso:LBL" "" \
     --button="gtk-cancel:1" \
     --button="gtk-ok:0" \
-    --columns=2 \
+    --columns=1 \  # Ajuste para uma coluna
     --separator="|" \
     --auto-close \
     --center
 )
 
-# Remover a barra de título padrão
-yad --title=" " --image="gtk-dialog-info" --window-icon="gtk-dialog-info" --width=400 --height=50 --text-align="center" --text="<b>Transferência em Andamento...</b>" --timeout=3 --no-buttons --center --skip-taskbar &
-
 # Obter valores dos campos
-IFS="|" read -r local_file remote_path <<< "$FORM"
+IFS="|" read -r local_file remote_path remote_user remote_host ssh_port <<< "$FORM"
 
 # Validar entrada
-if [ -z "$local_file" ] || [ -z "$remote_path" ]; then
+if [ -z "$local_file" ] || [ -z "$remote_path" ] || [ -z "$remote_user" ] || [ -z "$remote_host" ]; then
     print_error "Preencha todos os campos corretamente."
     exit 1
 fi
@@ -58,27 +60,44 @@ fi
 # Iniciar a transferência em segundo plano
 scp -P "$ssh_port" "$local_file" "$remote_user@$remote_host:$remote_path" &
 
-# Mostrar barra de progresso
+# Janela de progresso
 (
     while true; do
         sleep 1
         # Calcular o progresso (apenas um exemplo)
         progress=$(du -b "$local_file" | cut -f1)
-        yad --progress \
-            --percentage="$((progress * 100 / $(stat -c %s "$local_file")))" \
-            --text="<b>Transferindo:</b> $progress bytes" \
-            --auto-close \
-            --no-cancel \
-            --center
+        echo "$((progress * 100 / $(stat -c %s "$local_file"))) Transferindo: $progress bytes"
     done
-) &
+) | yad --title "Progresso da Transferência" \
+    --text-align="center" \
+    --width=500 \
+    --height=150 \
+    --progress \
+    --auto-close \
+    --no-cancel \
+    --center
 
 # Esperar até que a transferência seja concluída
 wait
 
 # Verificar o status da transferência
 if [ $? -eq 0 ]; then
-    print_success "Transferência concluída!"
+    yad --title "Transferência Concluída" \
+        --text-align="center" \
+        --width=300 \
+        --height=100 \
+        --image="gtk-ok" \
+        --text="<b>Transferência concluída!</b>" \
+        --button="gtk-ok:0" \
+        --center
 else
-    print_error "Erro durante a transferência. Verifique as permissões e a disponibilidade do arquivo."
+    yad --title "Erro na Transferência" \
+        --text-align="center" \
+        --width=300 \
+        --height=100 \
+        --image="gtk-no" \
+        --text="<b>Erro durante a transferência.</b>\nVerifique as permissões e a disponibilidade do arquivo." \
+        --button="gtk-ok:0" \
+        --center
 fi
+
